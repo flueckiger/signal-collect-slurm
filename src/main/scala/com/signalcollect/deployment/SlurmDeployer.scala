@@ -33,6 +33,11 @@ object SlurmDeployer extends App {
   def deploy(config: Config) {
     val serverAddress = config.getString("deployment.server.address")
     val serverUsername = config.getString("deployment.server.username")
+    val serverPrivateKeyFilePath = if (config.hasPath("deployment.server.private-key-file-path")) {
+      Some(config.getString("deployment.server.private-key-file-path"))
+    } else {
+      None
+    }
     val jobRepetitions = if (config.hasPath("deployment.job.repetitions")) {
       config.getInt("deployment.job.repetitions")
     } else {
@@ -73,7 +78,11 @@ object SlurmDeployer extends App {
     val deploymentJar = config.getString("deployment.jvm.deployed-jar")
     val deploymentJvmPath = config.getString("deployment.jvm.binary-path")
     val deploymentJvmParameters = config.getString("deployment.jvm.parameters")
-    val jobSubmitter = new SlurmJobSubmitter(username = serverUsername, hostname = serverAddress)
+    val jobSubmitter = if (serverPrivateKeyFilePath.isDefined) {
+      new SlurmJobSubmitter(username = serverUsername, hostname = serverAddress, privateKeyFilePath = serverPrivateKeyFilePath.get)
+    } else {
+      new SlurmJobSubmitter(username = serverUsername, hostname = serverAddress)
+    }
     val kryoInitializer = if (config.hasPath("deployment.akka.kryo-initializer")) {
       config.getString("deployment.akka.kryo-initializer")
     } else {
