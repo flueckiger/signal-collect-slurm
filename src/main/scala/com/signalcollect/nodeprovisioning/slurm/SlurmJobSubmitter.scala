@@ -24,6 +24,7 @@ import java.io.File
 import scala.language.postfixOps
 import scala.sys.process.stringToProcess
 import ch.ethz.ssh2.Connection
+import ch.ethz.ssh2.SCPClient
 import ch.ethz.ssh2.StreamGobbler
 import com.signalcollect.nodeprovisioning.IoUtil
 
@@ -37,7 +38,10 @@ case class SlurmJobSubmitter(
   override def copyFileToCluster(localPath: String, targetPath: String = "") {
     val commandCopy = "scp -v " + localPath + " " + username + "@" + hostname + ":" + targetPath
     println(commandCopy)
-    println(commandCopy !!)
+    val connection = connectToHost
+    val scp = new SCPClient(connection)
+    scp.put(localPath, targetPath)
+    connection.close
     Thread.sleep(1000) // wait a second to give NFS time to update and make the copied file visible
   }
 
