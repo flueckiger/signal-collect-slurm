@@ -71,8 +71,7 @@ case class SlurmHost(
             out.write(config)
             out.close
             jobSubmitter.copyFileToCluster(configPath)
-            val deleteConfig = "rm " + configPath
-            deleteConfig !!
+            new File(configPath).delete()
             val result = jobSubmitter.runOnClusterNodes(job.jobId.toString, job.numberOfNodes, coresPerNode, jarName, mainClass, priority, jvmParameters, jdkBinPath, workingDir)
             println("Job " + job.jobId + " has been submitted.")
             result
