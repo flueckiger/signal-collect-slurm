@@ -29,6 +29,7 @@ abstract class AbstractSlurmJobSubmitter extends Serializable {
 
   def runOnClusterNodes(
     jobId: String,
+    nodeList: Option[String],
     numberOfNodes: Int,
     coresPerNode: Int,
     jarname: String,
@@ -38,7 +39,7 @@ abstract class AbstractSlurmJobSubmitter extends Serializable {
     jdkBinPath: String,
     workingDir: String,
     mailAddress: Option[String] = None): String = {
-    val script = getShellScript(jobId, numberOfNodes, coresPerNode, jarname, mainClass, priority, jvmParameters, jdkBinPath, workingDir, mailAddress)
+    val script = getShellScript(jobId, nodeList, numberOfNodes, coresPerNode, jarname, mainClass, priority, jvmParameters, jdkBinPath, workingDir, mailAddress)
     //println("The batchscript")
     //println(script)
     val qsubCommand = """sbatch """ + jobId + ".sh" //TODO // | base64 -d
@@ -51,6 +52,7 @@ abstract class AbstractSlurmJobSubmitter extends Serializable {
 
   def getShellScript(
     jobId: String,
+    nodeList: Option[String],
     numberOfNodes: Int,
     coresPerNode: Int,
     jarname: String,
@@ -65,6 +67,7 @@ abstract class AbstractSlurmJobSubmitter extends Serializable {
 
     val script = """#!/bin/bash
 #SBATCH --job-name=""" + jobId + """
+""" + { if (nodeList.isDefined) "#SBATCH --nodelist=\"" + nodeList.get + '"' else "" } + """
 #SBATCH -N """ + numberOfNodes + """
 #SBATCH -n """ + numberOfNodes + """
 #SBATCH -c """ + coresPerNode + """

@@ -24,4 +24,5 @@ import com.signalcollect.util.RandomString
 case class Job(
   execute: () => Unit,
   jobId: String = RandomString.generate(6),
+  nodeList: Option[String],
   numberOfNodes: Int = 1)

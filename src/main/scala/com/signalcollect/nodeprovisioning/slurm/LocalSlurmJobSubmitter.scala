@@ -27,6 +27,7 @@ class LocalSlurmJobSubmitter extends AbstractSlurmJobSubmitter {
 
   override def runOnClusterNodes(
     jobId: String,
+    nodeList: Option[String],
     numberOfNodes: Int,
     coresPerNode: Int,
     jarname: String,
@@ -38,6 +39,7 @@ class LocalSlurmJobSubmitter extends AbstractSlurmJobSubmitter {
     mailAddress: Option[String] = None): String = {
     val script = getShellScript(
       jobId,
+      nodeList,
       numberOfNodes,
       coresPerNode,
       jarname,
